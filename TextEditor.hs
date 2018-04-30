@@ -9,20 +9,25 @@ data TextEditor = TextEditor { line :: String,
                                clipboard :: String
                               } deriving (Show)
 
-main = do { putStrLn "### TEXT EDITOR ###\n1 - New file\n2 - Load file";
-            x <- readLn;
-            if x == 1 then
-              putStrLn "Creating new file...";
-            else if x == 2 then do {
-                putStrLn "Enter name of file to load";
-                y <- readLn;
-                if y == 1 then
-                  putStrLn "ok";
-                else
-                  putStrLn "not ok";
-              }
-            else
-              putStrLn "Unknown command";
-          }
-
 displayText (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr}) = slice 0 (cp-1) l ++ ['|'] ++ cp `drop` l
+
+intro = putStrLn "#### TEXT EDITOR ####\nType '/loadFile *filename*' to load a file.\nType '/saveFile *filename*' to save a file.\nType '/cursor left' or '/cursor right' to move the cursor.\nType '/highlight on' and '/highlight off' to start or stop highlighting.\nType '/delete' to delete everything that is currently highlighted.\nType '/cut', '/copy' and '/paste' to use those functions.\n\nEverything else will append the current line."
+
+main = do
+        i <- getLine
+        if null i
+          then return ()
+        else if i == "/help"
+          then do
+            intro
+            main
+          else do
+            putStrLn (displayText (TextEditor {line = i, cursorPos = length i, highlightLeft = 0, highlightRight = 0, clipboard = "empty"}))
+            main
+
+
+
+
+
+
+--let x = TextEditor {line="Hello World", cursorPos=3, highlightLeft=0, highlightRight=2, clipboard="world"}
