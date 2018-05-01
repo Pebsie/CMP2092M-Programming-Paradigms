@@ -21,10 +21,12 @@ main = do
           then do
             intro
             main
+
           else do
             putStrLn (displayText (TextEditor {line = i, cursorPos = length i, highlightLeft = 0, highlightRight = 0, clipboard = "empty"}))
             main
 
+editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr}) = do --recursion here
 
 
 
