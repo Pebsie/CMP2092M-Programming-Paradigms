@@ -14,19 +14,29 @@ displayText (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlight
 intro = putStrLn "#### TEXT EDITOR ####\nType '/loadFile *filename*' to load a file.\nType '/saveFile *filename*' to save a file.\nType '/cursor left' or '/cursor right' to move the cursor.\nType '/highlight on' and '/highlight off' to start or stop highlighting.\nType '/delete' to delete everything that is currently highlighted.\nType '/cut', '/copy' and '/paste' to use those functions.\n\nEverything else will append the current line."
 
 main = do
-        i <- getLine
-        if null i
-          then return ()
-        else if i == "/help"
-          then do
-            intro
-            main
+        intro
+        editor (TextEditor {line = "", cursorPos = 0, highlightLeft = 0, highlightRight = 0, clipboard = ""})
 
-          else do
-            putStrLn (displayText (TextEditor {line = i, cursorPos = length i, highlightLeft = 0, highlightRight = 0, clipboard = "empty"}))
-            main
+editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr, clipboard = clip}) = do { --in order to be able to change values within the editor we need to use recursion, changing the parameter each time
+  putStrLn (displayText (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr}));
+  i <- getLine;
+  if i == "/cursor left"
+    then do
+      editor (TextEditor {line = l, cursorPos = (pred cp), highlightLeft = hl, highlightRight = hr, clipboard = clip});
+  else if i == "/cursor right"
+    then do
+      editor (TextEditor {line = l, cursorPos = (succ cp), highlightLeft = hl, highlightRight = hr, clipboard = clip});
+  else if i == "/quit"
+    then do
+      return ();
+  else if head i == '/' --we don't want to insert into the line text that is a mistyped command
+    then do
+      putStrLn "Unknown command.";
+      editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr, clipboard = clip});
+  else
+    do editor (TextEditor {line = slice 0 (cp-1) l ++ i ++ cp `drop` l, cursorPos = length (slice 0 (cp-1) l ++ i ++ cp `drop` l), highlightLeft = hl, highlightRight = hr, clipboard = clip});
 
-editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr}) = do --recursion here
+}
 
 
 
