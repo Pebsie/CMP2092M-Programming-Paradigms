@@ -1,7 +1,6 @@
 module Main where
 
-import System.IO
-import Control.Monad --for file reading and saving
+import System.IO --for file reading and saving
 
 slice from to x = take (to - from + 1)(drop from x) --slice an array and return values from index to to index from
 
@@ -91,7 +90,9 @@ editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight
     then do
       putStrLn "Enter filename with extension.";
       x <- getLine;
-      editor (TextEditor {line = x, cursorPos = cp, highlightLeft = hl, highlightRight = hr, clipboard = clip, highlightOn = ho});
+      a <- openFile x ReadMode;
+      line <- hGetLine a;
+      editor (TextEditor {line = line, cursorPos = length line, highlightLeft = hl, highlightRight = hr, clipboard = clip, highlightOn = ho});
   else if head i == '/' --we don't want to insert into the line text that is a mistyped command
     then do
       putStrLn "Unknown command.";
