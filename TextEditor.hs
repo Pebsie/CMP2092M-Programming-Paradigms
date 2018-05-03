@@ -1,3 +1,7 @@
+--CMP2092M PROGRAMMING PARADIGMS
+--Haskell implementation of a Text Editor
+--Author: Thomas Lock LOC16606073
+
 module Main where
 
 import System.IO --for file reading and saving
@@ -89,10 +93,21 @@ editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight
   else if i == "/loadfile"
     then do
       putStrLn "Enter filename with extension.";
-      x <- getLine;
-      a <- openFile x ReadMode;
-      line <- hGetLine a;
+      x <- getLine; --get input for file name
+      a <- openFile x ReadMode; --open file x in read mode
+      line <- hGetLine a; --get String from IO
+      putStrLn "File loaded.";
+      hClose a; --close input file stream
       editor (TextEditor {line = line, cursorPos = length line, highlightLeft = hl, highlightRight = hr, clipboard = clip, highlightOn = ho});
+  else if i == "/writefile"
+    then do
+      putStrLn "Enter filename to be saved with extension.";
+      x <- getLine; --get input for file name
+      outputFile <- openFile x WriteMode; --open this file in write mode
+      hPutStrLn outputFile l;
+      putStrLn "File written.";
+      hClose outputFile;
+      editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight = hr, clipboard = clip, highlightOn = ho});
   else if head i == '/' --we don't want to insert into the line text that is a mistyped command
     then do
       putStrLn "Unknown command.";
@@ -101,9 +116,3 @@ editor (TextEditor {line = l, cursorPos = cp, highlightLeft = hl, highlightRight
     do editor (TextEditor {line = slice 0 (cp-1) l ++ i ++ cp `drop` l, cursorPos = (cp + length i), highlightLeft = hl, highlightRight = hr, clipboard = clip, highlightOn = ho});
 
 }
-
-
-
-
-
---let x = TextEditor {line="Hello World", cursorPos=3, highlightLeft=0, highlightRight=2, clipboard="world"}
